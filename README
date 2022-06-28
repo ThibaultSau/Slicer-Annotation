@@ -7,6 +7,6 @@ Pour faciliter la tache un script a été dévelopé, pour l'utiliser il faut le
 
 Dans les options : 
 Edit > Application Settings > General > Application startup screen
-![](images/lien%20script.PNG)
-Cliquer sur le dossier et remplacer le contenu du fichier par celui de ce dossier (test_slicer.py)
+![](images/lien_script.PNG)
+Cliquer sur le dossier et remplacer le contenu du fichier par celui de ce dossier (slicerrc.py)
 
