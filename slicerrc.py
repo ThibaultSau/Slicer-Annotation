@@ -16,6 +16,8 @@ class InfoDisplay(qt.QGroupBox):
     def __init__(self,title=''):
         super().__init__(title)
         self.text_widget = qt.QLabel('Loaded patient info')
+        #self.scroll_area = qt.QScrollArea()
+        #self.scroll_area.setWidget(self.text_widget)
         self.custom_layout = qt.QHBoxLayout(self)
         self.custom_layout.addWidget(self.text_widget)
         self.setLayout(self.custom_layout)
@@ -86,7 +88,7 @@ class MainWindow(qt.QWidget):
         export_button = qt.QPushButton("Export patient image")
         export_button.clicked.connect(self.save_all_volumes)
 
-        listwidgetsize = 5
+        listwidgetsize = 20
         self.custom_layout.addWidget(
             self.patient_list, 0, 0, 51, listwidgetsize, qt.Qt.AlignLeft
         )
@@ -129,6 +131,7 @@ class MainWindow(qt.QWidget):
             and self.current_patient
         ):
             print("Exporting current patient segmentation")
+            print(slicer.util.getNodesByClass("vtkMRMLSegmentationNode"))
             self.save_all_seg()
         self.current_patient = item.text()
         self.indice = self.patients.index(item.text())
@@ -222,6 +225,7 @@ class MainWindow(qt.QWidget):
 
     def update_dialog_window(self):
         text = ''
+        self.dialog_window.text_widget.setText(text)
         current_patient_info = self.patient_info[self.current_patient]
         for i,info in enumerate(current_patient_info) :
             text += f'Lesion {i}:  {str(info)}'.replace("\'",'').replace('{','').replace('}','')
@@ -230,7 +234,7 @@ class MainWindow(qt.QWidget):
         text += "\nVolumes to segment : one of\n"
         vol_shape = self.sort_volumes_by_shape()
         for _, item in vol_shape.items():
-            text +=str([patient.GetName() for patient in item]).replace('imageOrientation','').replace('[','').replace(']','')+'\n'
+            text_to_add =str([patient.GetName() if 'Loc' not in patient.GetName()  else '' for patient in item ]).replace("\'",'').replace('imageOrientation','').replace('[','').replace(']','') 
         self.dialog_window.text_widget.setText(text)
 
     def load(self, patient_path):
@@ -258,6 +262,7 @@ class MainWindow(qt.QWidget):
                 self.current_dir, self.export_dir, self.current_patient
             )
             if os.path.isdir(patient_exported_images):
+                print('Loading previous segmentations')
                 for seg in filter(
                     self.filter_patient_seg, os.listdir(patient_exported_images)
                 ):
