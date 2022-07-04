@@ -32,3 +32,7 @@ Après avoir copié le chemin dans la barre "Directory" la fenêtre ressemblera 
 ![](images/Capture_fenetre_chargee.PNG)
 
 Les patients rouges ne sont pas segmentés, les patients bleus foncé ont au moins une segmentation de faite, le petient gris est le patient actuellement chargé dans Slicer.
+
+L'onglet en bas à droite indique les informations du patient :
+- Les différentes lésions du patient : la taille de la lésion, son origine et le diagnostic pour aider à retrouver la lésion
+- Les différents volumes du patient, les volumes sur une même ligne ont les mêmes dimensions et un seul de ces volumes peut être segmenté.
