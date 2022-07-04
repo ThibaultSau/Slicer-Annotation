@@ -1,3 +1,5 @@
 venv/
 
 testqt.py
+
+*.pdf
