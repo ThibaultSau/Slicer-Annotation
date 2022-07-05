@@ -11,16 +11,18 @@ from functools import partial
 from PythonQt import QtCore
 from datetime import datetime
 
-
+#TODO : option pour exporter en niftii/nrrd, faire deux dossiers, faire deux boutons
+#TODO : importer toutes les segmentations si elle ont été volumes
 class InfoDisplay(qt.QGroupBox):
-    def __init__(self,title=''):
+    def __init__(self, title=""):
         super().__init__(title)
-        self.text_widget = qt.QLabel('Loaded patient info')
-        #self.scroll_area = qt.QScrollArea()
-        #self.scroll_area.setWidget(self.text_widget)
+        self.text_widget = qt.QLabel("Loaded patient info")
+        # self.scroll_area = qt.QScrollArea()
+        # self.scroll_area.setWidget(self.text_widget)
         self.custom_layout = qt.QHBoxLayout(self)
         self.custom_layout.addWidget(self.text_widget)
         self.setLayout(self.custom_layout)
+
 
 class DirectoryLineEdit(qt.QWidget, qt.QObject):
     clicked = qt.Signal(str)
@@ -51,7 +53,7 @@ class MainWindow(qt.QWidget):
         self.patients = None
         self.exported_patients = None
         self.current_dir = None
-        self.export_dir = None
+        self.export_dir = "export"
         self.current_patient = None
         self.indice = None
         self.lesion_name = {
@@ -60,28 +62,30 @@ class MainWindow(qt.QWidget):
             2: "Lesion_2",
             3: "Lesion_3",
         }
-        self.person_name = ""
-        self.patient_info={}
+        self.operator_name = "Pierre"
+        self.patient_info = {}
 
         self.setWindowTitle("Segmentation editor")
         self.custom_layout = qt.QGridLayout()
         self.patient_list = qt.QListWidget()
-        self.patient_list.itemDoubleClicked.connect(self.loadFromWidget)
+        self.patient_list.itemDoubleClicked.connect(self.load_from_widget)
 
         self.dialog_window = InfoDisplay("Patient Info")
 
-        search_bar = DirectoryLineEdit(default_text=r"C:\Users\tib\Desktop\CBIR1-10 - vri")
+        search_bar = DirectoryLineEdit(
+            default_text=r"C:\Users\tib\Desktop\CBIR1-10 - vri"
+        )
         search_bar.clicked.connect(self.change_current_dir)
 
         self.export_dir_bar = DirectoryLineEdit(
-            "Export directory", "Confirm", default_text="export"
+            "Export directory", "Confirm", default_text=self.export_dir
         )
         self.export_dir_bar.clicked.connect(self.change_export_dir)
 
         self.operator_bar = DirectoryLineEdit(
-            "Operator name", "confirm", default_text="Pierre"
+            "Operator name", "Confirm", default_text=self.operator_name
         )
-        self.operator_bar.clicked.connect(self.change_person_name)
+        self.operator_bar.clicked.connect(self.change_operator_name)
 
         next_button = qt.QPushButton("Next Patient")
         next_button.clicked.connect(self.next)
@@ -106,8 +110,9 @@ class MainWindow(qt.QWidget):
         # Set the layout on the application's window
         self.setLayout(self.custom_layout)
 
-    def change_person_name(self, operator_name):
-        self.person_name = operator_name
+    def change_operator_name(self, operator_name):
+        print(f"Changing operator name to : {operator_name} ")
+        self.operator_name = operator_name
 
     def sort_volumes_by_shape(self):
         vol_shape = {}
@@ -124,10 +129,10 @@ class MainWindow(qt.QWidget):
     def export_path(self):
         return os.path.join(self.current_dir, self.export_dir, self.current_patient)
 
-    def loadFromWidget(self, item):
+    def load_from_widget(self, item):
         print("Loading patient from widget")
         if (
-            slicer.util.getNodesByClass("vtkMRMLSegmentationNode")
+            slicer.util.getNodesByClass("vtkMRMLSegmentationNode") # Verifier pour le not si ca exporte bien
             and self.current_patient
         ):
             print("Exporting current patient segmentation")
@@ -135,6 +140,8 @@ class MainWindow(qt.QWidget):
             self.save_all_seg()
         self.current_patient = item.text()
         self.indice = self.patients.index(item.text())
+        DICOMUtils.clearDatabase(slicer.dicomDatabase)
+        slicer.mrmlScene.Clear()
         self.load(os.path.join(self.current_dir, self.current_patient))
 
     def next(self):
@@ -152,7 +159,7 @@ class MainWindow(qt.QWidget):
             self.indice += 1
         else:
             self.indice = 0
-        while self.patients[self.indice] not in self.exported_patients:
+        while self.patients[self.indice] in self.exported_patients:
             self.indice += 1
         self.current_patient = self.patients[self.indice]
         patient_path = os.path.join(self.current_dir, self.current_patient)
@@ -178,6 +185,13 @@ class MainWindow(qt.QWidget):
         else:
             print("unknown error")
 
+    #TODO : améliorer cette fonction ? si elle est pas buguée
+    def update_exported_patients(self):
+        if self.current_dir and self.export_dir :
+            export_folder = os.path.join(self.current_dir, self.export_dir)
+            self.exported_patients = list(filter(lambda x : os.listdir(os.path.join(export_folder,x)),os.listdir(export_folder)))
+        
+
     def save_all_seg(self, lesion_specificity=""):
         # Getting the current date and time
         dt = datetime.now()
@@ -192,23 +206,23 @@ class MainWindow(qt.QWidget):
                         slicer.vtkMRMLSegmentationNode.GetReferenceImageGeometryReferenceRole()
                     )
                     for item in vol_shape[slicer.util.arrayFromVolume(master).shape]:
-                        slicer.util.exportNode(
-                            seg,
-                            os.path.join(
+                        # seg.setMasterVolumeNode(item) utiliser plutot SetNodeReferenceID mais pas de doc pour l'instant
+                        seg_name = os.path.join(
                                 self.export_path(),
                                 item.GetName()[3:].replace(":", "")
-                                + self.person_name
-                                + str(dt)[:16].replace(" ", "-")
+                                + self.operator_name
+                                + str(dt)[:16].replace(" ", "-").replace(":","_")
                                 + lesion_specificity
                                 + ".seg.nrrd",
-                            ),
+                            )
+                        slicer.util.exportNode(
+                            seg,
+                            seg_name,
                         )
                         print(
-                            f"Segmentation {os.path.join(self.export_path(),item.GetName()[3:])} saved"
+                            f"Segmentation {seg_name} saved"
                         )
-                self.exported_patients = os.listdir(
-                    os.path.join(self.current_dir, self.export_dir)
-                )
+                self.update_exported_patients()
             else:
                 print("Nothing to export")
         elif self.current_patient is None:
@@ -224,17 +238,39 @@ class MainWindow(qt.QWidget):
             is_seg = is_seg and self.lesion_name[i] in patient_exported_image
 
     def update_dialog_window(self):
-        text = ''
-        self.dialog_window.text_widget.setText(text)
+        text = self.current_patient + ":\n"
         current_patient_info = self.patient_info[self.current_patient]
-        for i,info in enumerate(current_patient_info) :
-            text += f'Lesion {i}:  {str(info)}'.replace("\'",'').replace('{','').replace('}','')
-            text += '\n'
+        for i, info in enumerate(current_patient_info):
+            text += (
+                f"Lesion {i+1}:  {str(info)}".replace("'", "")
+                .replace("{", "")
+                .replace("}", "")
+            )
+            text += "\n"
 
-        text += "\nVolumes to segment : one of\n"
+        text += "\nVolumes to segment : one of\n\n"
         vol_shape = self.sort_volumes_by_shape()
         for _, item in vol_shape.items():
-            text_to_add =str([patient.GetName() if 'Loc' not in patient.GetName()  else '' for patient in item ]).replace("\'",'').replace('imageOrientation','').replace('[','').replace(']','') 
+            text_to_add = [
+                patient.GetName() if "Loc" not in patient.GetName() else ""
+                for patient in item
+            ]
+            text_to_add = list(filter(lambda x : x !="", text_to_add))
+            if len(text_to_add) > 5:
+                text_to_add = [
+                    patient_text[:int(len(patient_text)/2)]+"..." for patient_text in text_to_add
+                ]
+            text_to_add = (
+                str(text_to_add)
+                .replace("'", "")
+                .replace("imageOrientation", "")
+                .replace("[", "")
+                .replace("]", "")
+            )
+            print(text_to_add)
+            if len(text_to_add) > 10:
+                text += text_to_add
+                text += "\n"
         self.dialog_window.text_widget.setText(text)
 
     def load(self, patient_path):
@@ -262,7 +298,7 @@ class MainWindow(qt.QWidget):
                 self.current_dir, self.export_dir, self.current_patient
             )
             if os.path.isdir(patient_exported_images):
-                print('Loading previous segmentations')
+                print("Loading previous segmentations")
                 for seg in filter(
                     self.filter_patient_seg, os.listdir(patient_exported_images)
                 ):
@@ -271,6 +307,7 @@ class MainWindow(qt.QWidget):
                     )
         current_patient_widget = self.patient_list.item(self.indice)
         current_patient_widget.setBackground(qt.Qt.lightGray)
+        self.load_patients_in_list()
         self.update_dialog_window()
 
     def change_export_dir(self, export_dir):
@@ -281,13 +318,11 @@ class MainWindow(qt.QWidget):
         if self.export_dir in self.patients:
             self.patients.remove(self.export_dir)
         if self.current_dir:
-            self.exported_patients = os.listdir(
-                os.path.join(self.current_dir, self.export_dir)
-            )
+            self.update_exported_patients()
             if self.current_dir is not None:
                 self.load_patients_in_list()
 
-    def parse_info_file(self,info_file_path):
+    def parse_info_file(self, info_file_path):
         self.patient_info = {}
 
         with open(info_file_path, "r") as f:
@@ -296,7 +331,7 @@ class MainWindow(qt.QWidget):
                 parts = line.split(",")
                 if parts[0] not in self.patient_info.keys():
                     self.patient_info[parts[0]] = []
-                if parts[1]!=0:
+                if parts[1] != 0:
                     self.patient_info[parts[0]].append(
                         {
                             "lesion size": parts[2],
@@ -306,25 +341,36 @@ class MainWindow(qt.QWidget):
                     )
 
     def change_current_dir(self, directory):
-        info_file = list(filter(lambda x : os.path.isfile(os.path.join(directory,x)),os.listdir(directory)))
+        info_file = list(
+            filter(
+                lambda x: os.path.isfile(os.path.join(directory, x)) and '.csv' in x,
+                os.listdir(directory),
+            )
+        )
         if info_file:
-            self.parse_info_file(os.path.join(directory,info_file[0]))
+            self.parse_info_file(os.path.join(directory, info_file[0]))
         self.patient_list.clear()
         self.current_dir = directory
-        self.patients = list(filter(lambda x : os.path.isdir(os.path.join(directory,x)),os.listdir(directory)))
+        self.patients = list(
+            filter(
+                lambda x: os.path.isdir(os.path.join(directory, x)),
+                os.listdir(directory),
+            )
+        )
         self.change_export_dir(self.export_dir_bar.text_input.text)
 
     def load_patients_in_list(self):
         max_width = 0
-        height=None
-        nb_lesion=0
+        height = None
+        nb_lesion = 0
+        self.patient_list.clear()
         if self.export_dir and self.export_dir in self.patients:
             self.patients.remove(self.export_dir)
         for patient in self.patients:
-            try :
+            try:
                 nb_lesion = len(self.patient_info[patient])
-            except :
-                nb_lesion=0
+            except:
+                nb_lesion = 0
             patient_list_item = qt.QListWidgetItem()
             self.patient_list.addItem(patient_list_item)
             patient_list_item.setText(patient)
@@ -342,9 +388,9 @@ class MainWindow(qt.QWidget):
             button_layout.setContentsMargins(0, 0, 0, 0)
             button_layout.addStretch()
 
-            if nb_lesion<2:
+            if nb_lesion < 2:
                 button = qt.QPushButton("ovaire sain")
-            else :
+            else:
                 button = qt.QPushButton("sain")
             button.clicked.connect(partial(self.export, 0))
             button_layout.addWidget(button, qt.Qt.AlignVCenter)
@@ -359,7 +405,7 @@ class MainWindow(qt.QWidget):
                 patient_export_button.size.height(),
             )
 
-            if self.exported_patients:
+            if self.exported_patients is not None:
                 if patient in self.exported_patients:
                     patient_list_item.setBackground(qt.Qt.blue)
                 else:
@@ -371,9 +417,7 @@ class MainWindow(qt.QWidget):
             self.patient_list.setItemWidget(patient_list_item, patient_widget)
         # self.patient_list.setSizePolicy(qt.QtWidgets.QSizePolicy.Expanding)
 
-        self.patient_list.setGridSize(
-            qt.QSize(int(2 * (max_width / 3)), height)
-        )
+        self.patient_list.setGridSize(qt.QSize(int(2 * (max_width / 3)), height))
 
     def export(self, lesion_number, item):
         if slicer.util.getNodesByClass("vtkMRMLSegmentationNode"):
