@@ -82,10 +82,11 @@ class MainWindow(qt.QWidget):
         self.patient_list = qt.QListWidget()
         self.patient_list.itemDoubleClicked.connect(self.load_from_widget)
 
-        self.dialog_window = InfoDisplay("Patient Info")
+        self.dialog_window = InfoDisplay("Patient Information")
+        self.info_window = InfoDisplay("Actions log")
 
         search_bar = DirectoryLineEdit(
-            default_text=r"C:\Users\tib\Desktop\CBIR1-10 - vri"
+            default_text=r"Enter work directory path"
         )
         search_bar.clicked.connect(self.change_current_dir)
 
@@ -118,6 +119,7 @@ class MainWindow(qt.QWidget):
         self.custom_layout.addWidget(self.export_dir_bar, 3, listwidgetsize + 1)
         self.custom_layout.addWidget(self.operator_bar, 4, listwidgetsize + 1)
         self.custom_layout.addWidget(self.dialog_window, 5, listwidgetsize + 1)
+        self.custom_layout.addWidget(self.dialog_window, 9, listwidgetsize + 1)
 
         # Set the layout on the application's window
         self.setLayout(self.custom_layout)
