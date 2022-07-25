@@ -1,5 +1,5 @@
 # import dicomweb_client
-# import vtk,  ctk
+# import vtk, ctk
 # import DICOMLib
 from genericpath import isfile
 import slicer, qt
@@ -20,6 +20,7 @@ color_dict = {
     "Pastel Pink" : [248, 200, 220],
     "Pastel Purple":[195, 177, 225],
     "Pastel Yellow":[255, 250, 160],
+    "Grey" : [192,192,192],
 }
 
 # TODO : option pour exporter en niftii/nrrd, faire deux dossiers, faire deux boutons
