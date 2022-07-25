@@ -29,7 +29,7 @@ color_dict = {
 class InfoDisplay(qt.QGroupBox):
     def __init__(self, title=""):
         super().__init__(title)
-        self.text_widget = qt.QLabel("Loaded patient info")
+        self.text_widget = qt.QLabel()
         # self.scroll_area = qt.QScrollArea()
         # self.scroll_area.setWidget(self.text_widget)
         self.custom_layout = qt.QHBoxLayout(self)
