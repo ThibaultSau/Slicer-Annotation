@@ -71,8 +71,8 @@ class MainWindow(qt.QWidget):
         self.lesion_name = {
             0: "sane_ovary",
             1: "lesion_1",
-            2: "Lesion_2",
-            3: "Lesion_3",
+            2: "lesion_2",
+            3: "lesion_3",
         }
         self.operator_name = "Pierre"
         self.patient_info = {}
