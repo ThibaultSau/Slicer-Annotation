@@ -31,7 +31,7 @@ def restart():
     slicer.app.restart()
 
 class InfoDisplay(qt.QGroupBox):
-    def __init__(self, title=""):
+    def __init__(self, title="",blinking=False):
         super().__init__(title)
         self.text_widget = qt.QLabel()
         # self.scroll_area = qt.QScrollArea()
@@ -39,9 +39,29 @@ class InfoDisplay(qt.QGroupBox):
         self.custom_layout = qt.QHBoxLayout(self)
         self.custom_layout.addWidget(self.text_widget)
         self.setLayout(self.custom_layout)
-    
+        self.blinking = blinking
+
     def setText(self,text):
+        if self.blinking :
+            self.blink()            
         self.text_widget.setText(text)
+
+    def set_timer(self,time,function):
+        timer = qt.QTimer(self)
+        timer.setInterval(time) 
+        timer.setSingleShot(True)
+        timer.timeout.connect(function)
+        timer.start()
+
+    def set_border_red(self):
+        self.setStyleSheet("QGroupBox { border: none;padding : 25 5 px;}")
+
+    def reset_border(self):
+        self.setStyleSheet("")
+
+    def blink(self):
+        self.set_timer(100,self.set_border_red)
+        self.set_timer(100+50,self.reset_border)
 
 
 class DirectoryLineEdit(qt.QWidget, qt.QObject):
@@ -103,7 +123,7 @@ class MainWindow(qt.QWidget):
         self.patient_list.itemDoubleClicked.connect(self.load_from_widget)
 
         self.dialog_window = InfoDisplay("Patient Information")
-        self.info_window = InfoDisplay("Actions log")
+        self.info_window = InfoDisplay("Actions log",blinking=True)
 
 
         self.search_bar.clicked.connect(self.change_current_dir)
