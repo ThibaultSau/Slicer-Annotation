@@ -40,7 +40,7 @@ class InfoDisplay(qt.QGroupBox):
         self.setLayout(self.custom_layout)
     
     def setText(self,text):
-        self.text_widget.settext(text)
+        self.text_widget.setText(text)
 
 
 class DirectoryLineEdit(qt.QWidget, qt.QObject):
