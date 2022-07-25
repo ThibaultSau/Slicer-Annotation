@@ -1,6 +1,7 @@
 # import dicomweb_client
 # import vtk,  ctk
 # import DICOMLib
+from genericpath import isfile
 import slicer, qt
 import os
 from DICOMLib import DICOMUtils
@@ -133,6 +134,16 @@ class MainWindow(qt.QWidget):
 
         # Set the layout on the application's window
         self.setLayout(self.custom_layout)
+    
+    def load_config(self):
+        work_dir,export_dir,operator_name = None, None, None
+        config_path = os.path.join(slicer.app.slicerHome,'config_seg.txt')
+        if os.path.isfile(config_path):
+            with open(config_path,'r') as f:
+                work_dir = f.readline().rstrip("\n")
+                export_dir = f.readline().rstrip("\n")
+                operator_name = f.readline().rstrip("\n")
+        return work_dir,export_dir,operator_name
 
     def change_operator_name(self, operator_name):
         print(f"Changing operator name to : {operator_name} ")
