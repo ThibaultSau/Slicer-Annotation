@@ -35,6 +35,9 @@ class InfoDisplay(qt.QGroupBox):
         self.custom_layout = qt.QHBoxLayout(self)
         self.custom_layout.addWidget(self.text_widget)
         self.setLayout(self.custom_layout)
+    
+    def setText(self,text):
+        self.text_widget.settext(text)
 
 
 class DirectoryLineEdit(qt.QWidget, qt.QObject):
@@ -130,14 +133,14 @@ class MainWindow(qt.QWidget):
         self.custom_layout.addWidget(self.export_dir_bar, 3, listwidgetsize + 1)
         self.custom_layout.addWidget(self.operator_bar, 4, listwidgetsize + 1)
         self.custom_layout.addWidget(self.dialog_window, 5, listwidgetsize + 1)
-        self.custom_layout.addWidget(self.dialog_window, 9, listwidgetsize + 1)
+        self.custom_layout.addWidget(self.info_window, 9, listwidgetsize + 1)
 
         # Set the layout on the application's window
         self.setLayout(self.custom_layout)
     
     def load_config(self):
         work_dir,export_dir,operator_name = None, None, None
-        config_path = os.path.join(slicer.app.slicerHome,'config_seg.txt')
+        config_path = os.path.join(os.path.normpath(slicer.app.slicerHome),'config_seg.txt')
         if os.path.isfile(config_path):
             with open(config_path,'r') as f:
                 work_dir = f.readline().rstrip("\n")
@@ -312,7 +315,7 @@ class MainWindow(qt.QWidget):
             if len(text_to_add) > 10:
                 text += text_to_add
                 text += "\n"
-        self.dialog_window.text_widget.setText(text)
+        self.dialog_window.setText(text)
 
     def load(self, patient_path):
         print(f"Loading patient {patient_path} ")
@@ -399,6 +402,7 @@ class MainWindow(qt.QWidget):
             )
         )
         self.change_export_dir(self.export_dir_bar.text_input.text)
+        self.info_window.setText()
 
     def load_patients_in_list(self):
         max_width = 0
