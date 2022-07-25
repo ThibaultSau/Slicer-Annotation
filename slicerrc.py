@@ -26,6 +26,9 @@ color_dict = {
 # TODO : importer toutes les segmentations si elle ont été volumes
 # TODO : Gérer les segmentations incomplètes/que les ovaires sains segmentés...
 
+def restart():
+    slicer.app.restart()
+
 class InfoDisplay(qt.QGroupBox):
     def __init__(self, title=""):
         super().__init__(title)
