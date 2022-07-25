@@ -241,11 +241,11 @@ class MainWindow(qt.QWidget):
                 )
             )
 
-    def save_all_seg(self, lesion_specificity=""):
+    def save_all_seg(self, lesion_specificity="lesion"):
         # Getting the current date and time
         dt = datetime.now()
         if self.current_patient and self.export_dir:
-            self.info_window.setText("Exporting segmentation")
+            self.info_window.setText(f"Exporting {lesion_specificity.replace('_',' ')}segmentation")
             if slicer.util.getNodesByClass("vtkMRMLSegmentationNode"):
                 if not os.path.isdir(self.export_path()):
                     print("patient export dir does not exist, creating")
@@ -338,12 +338,6 @@ class MainWindow(qt.QWidget):
 
         print(f"{patient_path} : Loaded")
         if self.exported_patients:
-            for patient in self.patients:
-                patient_widget = self.patient_list.item(self.patients.index(patient))
-                if patient in self.exported_patients:
-                    patient_widget.setBackground(qt.QBrush(qt.QColor(*color_dict['Pastel Blue'])))
-                else:
-                    patient_widget.setBackground(qt.QBrush(qt.QColor(*color_dict['Pastel Red'])))
             patient_exported_images = os.path.join(
                 self.current_dir, self.export_dir, self.current_patient
             )
@@ -355,9 +349,9 @@ class MainWindow(qt.QWidget):
                     slicer.util.loadSegmentation(
                         os.path.join(patient_exported_images, seg)
                     )
-        current_patient_widget = self.patient_list.item(self.indice)
-        current_patient_widget.setBackground(qt.Qt.lightGray)
         self.load_patients_in_list()
+        current_patient_widget = self.patient_list.item(self.indice)
+        current_patient_widget.setBackground(qt.QBrush(qt.QColor(*color_dict["Pastel Red"])))
         self.update_dialog_window()
 
     def change_export_dir(self, export_dir):
@@ -459,9 +453,9 @@ class MainWindow(qt.QWidget):
 
             if self.exported_patients is not None:
                 if patient in self.exported_patients:
-                    patient_list_item.setBackground(qt.QBrush(qt.QColor(*color_dict['Pastel Blue'])))#
+                    patient_list_item.setBackground(qt.QBrush(qt.QColor(*color_dict['Pastel Green'])))#
                 else:
-                    patient_list_item.setBackground(qt.QBrush(qt.QColor(*color_dict['Pastel Red'])))
+                    patient_list_item.setBackground(qt.QBrush(qt.QColor(*color_dict['Grey'])))
             width = patient_widget.sizeHint.width()
             height = patient_widget.sizeHint.height()
             if width > max_width:
