@@ -65,7 +65,6 @@ class MainWindow(qt.QWidget):
         self.patients = None
         self.exported_patients = None
         self.current_dir = None
-        self.export_dir = "export"
         self.current_patient = None
         self.indice = None
         self.lesion_name = {
@@ -74,8 +73,21 @@ class MainWindow(qt.QWidget):
             2: "lesion_2",
             3: "lesion_3",
         }
-        self.operator_name = "Pierre"
         self.patient_info = {}
+
+        work_dir,export_dir,operator_name = self.load_config()
+        if work_dir is not None :
+            self.search_bar = DirectoryLineEdit(
+                default_text=work_dir
+            )
+            self.export_dir = export_dir
+            self.operator_name = operator_name
+        else :
+            self.search_bar = DirectoryLineEdit(
+                default_text=r"Enter work directory path"
+            )
+            self.export_dir = "export"
+            self.operator_name = "Pierre"
 
         self.setWindowTitle("Segmentation editor")
         self.custom_layout = qt.QGridLayout()
@@ -85,10 +97,8 @@ class MainWindow(qt.QWidget):
         self.dialog_window = InfoDisplay("Patient Information")
         self.info_window = InfoDisplay("Actions log")
 
-        search_bar = DirectoryLineEdit(
-            default_text=r"Enter work directory path"
-        )
-        search_bar.clicked.connect(self.change_current_dir)
+
+        self.search_bar.clicked.connect(self.change_current_dir)
 
         self.export_dir_bar = DirectoryLineEdit(
             "Export directory", "Confirm", default_text=self.export_dir
@@ -115,7 +125,7 @@ class MainWindow(qt.QWidget):
         self.custom_layout.addWidget(
             export_button, 1, listwidgetsize + 1, qt.Qt.AlignVCenter
         )
-        self.custom_layout.addWidget(search_bar, 2, listwidgetsize + 1)
+        self.custom_layout.addWidget(self.search_bar, 2, listwidgetsize + 1)
         self.custom_layout.addWidget(self.export_dir_bar, 3, listwidgetsize + 1)
         self.custom_layout.addWidget(self.operator_bar, 4, listwidgetsize + 1)
         self.custom_layout.addWidget(self.dialog_window, 5, listwidgetsize + 1)
