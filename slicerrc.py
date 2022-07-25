@@ -151,6 +151,7 @@ class MainWindow(qt.QWidget):
     def change_operator_name(self, operator_name):
         print(f"Changing operator name to : {operator_name} ")
         self.operator_name = operator_name
+        self.info_window.setText('Operator name changed')
 
     def sort_volumes_by_shape(self):
         vol_shape = {}
@@ -365,6 +366,7 @@ class MainWindow(qt.QWidget):
             self.update_exported_patients()
             if self.current_dir is not None:
                 self.load_patients_in_list()
+        self.info_window.setText('Export dir changed')
 
     def parse_info_file(self, info_file_path):
         self.patient_info = {}
@@ -402,7 +404,7 @@ class MainWindow(qt.QWidget):
             )
         )
         self.change_export_dir(self.export_dir_bar.text_input.text)
-        self.info_window.setText()
+        self.info_window.setText('Directory Loaded')
 
     def load_patients_in_list(self):
         max_width = 0
