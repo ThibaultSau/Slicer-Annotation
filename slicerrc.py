@@ -223,11 +223,11 @@ class MainWindow(qt.QWidget):
                     f"Volume {os.path.join(self.export_path(),volume.GetName()[3:])} saved"
                 )
         elif self.current_patient is None:
-            print("no patient loaded, nothing to do to save patient volumes")
+            self.info_window.setText("No patient loaded, nothing to do to save patient volumes")
         elif self.export_dir is None:
-            print("No export directory")
+            self.info_window.setText("No export directory")
         else:
-            print("unknown error")
+            self.info_window.setText("Unknown error while trying to export patient volumes")
 
     # TODO : améliorer cette fonction ? si elle est pas buguée
     def update_exported_patients(self):
@@ -244,6 +244,7 @@ class MainWindow(qt.QWidget):
         # Getting the current date and time
         dt = datetime.now()
         if self.current_patient and self.export_dir:
+            self.info_window.setText("Exporting segmentation")
             if slicer.util.getNodesByClass("vtkMRMLSegmentationNode"):
                 if not os.path.isdir(self.export_path()):
                     print("patient export dir does not exist, creating")
@@ -270,13 +271,13 @@ class MainWindow(qt.QWidget):
                         print(f"Segmentation {seg_name} saved")
                 self.update_exported_patients()
             else:
-                print("Nothing to export")
+                self.info_window.setText("Nothing to export")
         elif self.current_patient is None:
-            print("no patient loaded, nothing to do to save patient segmentation")
+            self.info_window.setText("No patient loaded, nothing to do to save patient segmentation")
         elif self.export_dir is None:
-            print("No export directory")
+            self.info_window.setText("No export directory")
         else:
-            print("unknown error")
+            self.info_window.setText("Unknown error while trying to export segmentation")
 
     def filter_patient_seg(self, patient_exported_image):
         is_seg = "seg.nrrd" in patient_exported_image
