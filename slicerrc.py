@@ -11,8 +11,20 @@ from functools import partial
 from PythonQt import QtCore
 from datetime import datetime
 
-#TODO : option pour exporter en niftii/nrrd, faire deux dossiers, faire deux boutons
-#TODO : importer toutes les segmentations si elle ont été volumes
+color_dict = {
+    "Pastel Red": [255, 160, 160],
+    "Pastel Blue": [167, 199, 231],
+    "Pastel Green": [193, 225, 193],
+    "Pastel Orange": [250, 200, 152],
+    "Pastel Pink" : [248, 200, 220],
+    "Pastel Purple":[195, 177, 225],
+    "Pastel Yellow":[255, 250, 160],
+}
+
+# TODO : option pour exporter en niftii/nrrd, faire deux dossiers, faire deux boutons
+# TODO : importer toutes les segmentations si elle ont été volumes
+# TODO : Gérer les segmentations incomplètes/que les ovaires sains segmentés...
+
 class InfoDisplay(qt.QGroupBox):
     def __init__(self, title=""):
         super().__init__(title)
@@ -132,7 +144,9 @@ class MainWindow(qt.QWidget):
     def load_from_widget(self, item):
         print("Loading patient from widget")
         if (
-            slicer.util.getNodesByClass("vtkMRMLSegmentationNode") # Verifier pour le not si ca exporte bien
+            slicer.util.getNodesByClass(
+                "vtkMRMLSegmentationNode"
+            )  # Verifier pour le not si ca exporte bien
             and self.current_patient
         ):
             print("Exporting current patient segmentation")
@@ -185,12 +199,16 @@ class MainWindow(qt.QWidget):
         else:
             print("unknown error")
 
-    #TODO : améliorer cette fonction ? si elle est pas buguée
+    # TODO : améliorer cette fonction ? si elle est pas buguée
     def update_exported_patients(self):
-        if self.current_dir and self.export_dir :
+        if self.current_dir and self.export_dir:
             export_folder = os.path.join(self.current_dir, self.export_dir)
-            self.exported_patients = list(filter(lambda x : os.listdir(os.path.join(export_folder,x)),os.listdir(export_folder)))
-        
+            self.exported_patients = list(
+                filter(
+                    lambda x: os.listdir(os.path.join(export_folder, x)),
+                    os.listdir(export_folder),
+                )
+            )
 
     def save_all_seg(self, lesion_specificity=""):
         # Getting the current date and time
@@ -208,20 +226,18 @@ class MainWindow(qt.QWidget):
                     for item in vol_shape[slicer.util.arrayFromVolume(master).shape]:
                         # seg.setMasterVolumeNode(item) utiliser plutot SetNodeReferenceID mais pas de doc pour l'instant
                         seg_name = os.path.join(
-                                self.export_path(),
-                                item.GetName()[3:].replace(":", "")
-                                + self.operator_name
-                                + str(dt)[:16].replace(" ", "-").replace(":","_")
-                                + lesion_specificity
-                                + ".seg.nrrd",
-                            )
+                            self.export_path(),
+                            item.GetName()[3:].replace(":", "")
+                            + self.operator_name
+                            + str(dt)[:16].replace(" ", "-").replace(":", "_")
+                            + lesion_specificity
+                            + ".seg.nrrd",
+                        )
                         slicer.util.exportNode(
                             seg,
                             seg_name,
                         )
-                        print(
-                            f"Segmentation {seg_name} saved"
-                        )
+                        print(f"Segmentation {seg_name} saved")
                 self.update_exported_patients()
             else:
                 print("Nothing to export")
@@ -239,14 +255,15 @@ class MainWindow(qt.QWidget):
 
     def update_dialog_window(self):
         text = self.current_patient + ":\n"
-        current_patient_info = self.patient_info[self.current_patient]
-        for i, info in enumerate(current_patient_info):
-            text += (
-                f"Lesion {i+1}:  {str(info)}".replace("'", "")
-                .replace("{", "")
-                .replace("}", "")
-            )
-            text += "\n"
+        if self.patient_info :
+            current_patient_info = self.patient_info[self.current_patient]
+            for i, info in enumerate(current_patient_info):
+                text += (
+                    f"Lesion {i+1}:  {str(info)}".replace("'", "")
+                    .replace("{", "")
+                    .replace("}", "")
+                )
+                text += "\n"
 
         text += "\nVolumes to segment : one of\n\n"
         vol_shape = self.sort_volumes_by_shape()
@@ -255,10 +272,11 @@ class MainWindow(qt.QWidget):
                 patient.GetName() if "Loc" not in patient.GetName() else ""
                 for patient in item
             ]
-            text_to_add = list(filter(lambda x : x !="", text_to_add))
+            text_to_add = list(filter(lambda x: x != "", text_to_add))
             if len(text_to_add) > 5:
                 text_to_add = [
-                    patient_text[:int(len(patient_text)/2)]+"..." for patient_text in text_to_add
+                    patient_text[: int(len(patient_text) / 2)] + "..."
+                    for patient_text in text_to_add
                 ]
             text_to_add = (
                 str(text_to_add)
@@ -291,9 +309,9 @@ class MainWindow(qt.QWidget):
             for patient in self.patients:
                 patient_widget = self.patient_list.item(self.patients.index(patient))
                 if patient in self.exported_patients:
-                    patient_widget.setBackground(qt.Qt.blue)
+                    patient_widget.setBackground(qt.QBrush(qt.QColor(*color_dict['Pastel Blue'])))
                 else:
-                    patient_widget.setBackground(qt.Qt.red)
+                    patient_widget.setBackground(qt.QBrush(qt.QColor(*color_dict['Pastel Red'])))
             patient_exported_images = os.path.join(
                 self.current_dir, self.export_dir, self.current_patient
             )
@@ -343,7 +361,7 @@ class MainWindow(qt.QWidget):
     def change_current_dir(self, directory):
         info_file = list(
             filter(
-                lambda x: os.path.isfile(os.path.join(directory, x)) and '.csv' in x,
+                lambda x: os.path.isfile(os.path.join(directory, x)) and ".csv" in x,
                 os.listdir(directory),
             )
         )
@@ -407,14 +425,15 @@ class MainWindow(qt.QWidget):
 
             if self.exported_patients is not None:
                 if patient in self.exported_patients:
-                    patient_list_item.setBackground(qt.Qt.blue)
+                    patient_list_item.setBackground(qt.QBrush(qt.QColor(*color_dict['Pastel Blue'])))#
                 else:
-                    patient_list_item.setBackground(qt.Qt.red)
+                    patient_list_item.setBackground(qt.QBrush(qt.QColor(*color_dict['Pastel Red'])))
             width = patient_widget.sizeHint.width()
             height = patient_widget.sizeHint.height()
             if width > max_width:
                 max_width = width
             self.patient_list.setItemWidget(patient_list_item, patient_widget)
+
         # self.patient_list.setSizePolicy(qt.QtWidgets.QSizePolicy.Expanding)
 
         self.patient_list.setGridSize(qt.QSize(int(2 * (max_width / 3)), height))
