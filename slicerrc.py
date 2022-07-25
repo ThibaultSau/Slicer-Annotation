@@ -151,11 +151,19 @@ class MainWindow(qt.QWidget):
                 export_dir = f.readline().rstrip("\n")
                 operator_name = f.readline().rstrip("\n")
         return work_dir,export_dir,operator_name
+    
+    def write_config(self):
+        config_path = os.path.join(os.path.normpath(slicer.app.slicerHome),'config_seg.txt')
+        with open(config_path,'w') as f:
+            f.write(self.current_dir+"\n")
+            f.write(self.export_dir+"\n")
+            f.write(self.operator_name+"\n")       
 
     def change_operator_name(self, operator_name):
         print(f"Changing operator name to : {operator_name} ")
         self.operator_name = operator_name
         self.info_window.setText('Operator name changed')
+        self.write_config()
 
     def sort_volumes_by_shape(self):
         vol_shape = {}
@@ -366,6 +374,7 @@ class MainWindow(qt.QWidget):
             if self.current_dir is not None:
                 self.load_patients_in_list()
         self.info_window.setText('Export dir changed')
+        self.write_config()
 
     def parse_info_file(self, info_file_path):
         self.patient_info = {}
@@ -404,6 +413,7 @@ class MainWindow(qt.QWidget):
         )
         self.change_export_dir(self.export_dir_bar.text_input.text)
         self.info_window.setText('Directory Loaded')
+        self.write_config()
 
     def load_patients_in_list(self):
         max_width = 0
