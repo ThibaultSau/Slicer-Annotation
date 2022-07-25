@@ -9,7 +9,7 @@ Pour l'utiliser il faut le charger dans Slicer pour qu'il l'utilise automatiquem
 Dans les options : 
 Edit > Application Settings > General > Application startup screen
 ![](images/lien_script.PNG)
-Cliquer sur le dossier et remplacer le contenu du fichier par celui de ce dossier (slicerrc.py)
+Le contenu du fichier à cette destination doit être remplacé par celui du fichier slicerrc fourni (clic droit > ouvrir avec notepad++ > CTRL+A> CRTL+C, dans le fichier .slicerrc.py>clic droit> ouvrir avec notepad++ > CTRL+A > CRTL+V)
 
 A chaque démarage de slicer le script sera chargé et ouvrira une fenêtre de dialogue avec plusieurs options.
 
