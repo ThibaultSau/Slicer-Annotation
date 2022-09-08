@@ -366,8 +366,9 @@ class MainWindow(qt.QWidget):
             )
             print(text_to_add)
             if len(text_to_add) > 10:
+                text += 'Un parmis : '
                 text += text_to_add
-                text += "\n"
+                text += ".\n"
         self.dialog_window.setText(text)
 
     def load(self, patient_path):
