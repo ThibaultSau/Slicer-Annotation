@@ -335,15 +335,17 @@ class MainWindow(qt.QWidget):
     def update_dialog_window(self):
         text = self.current_patient + ":\n"
         if self.patient_info :
-            current_patient_info = self.patient_info[self.current_patient]
-            for i, info in enumerate(current_patient_info):
-                text += (
-                    f"Lesion {i+1}:  {str(info)}".replace("'", "")
-                    .replace("{", "")
-                    .replace("}", "")
-                )
-                text += "\n"
-
+            if  self.current_patient in self.patient_info.keys() :
+                current_patient_info = self.patient_info[self.current_patient]
+                for i, info in enumerate(current_patient_info):
+                    text += (
+                        f"Lesion {i+1}:  {str(info)}".replace("'", "")
+                        .replace("{", "")
+                        .replace("}", "")
+                    )
+                    text += "\n"
+            else :
+                text += "No patient info found\n"
         text += "\nVolume a segmenter : au choix, un par ligne\n\n"
         vol_shape = self.sort_volumes_by_shape()
         for _, item in vol_shape.items():
@@ -499,7 +501,6 @@ class MainWindow(qt.QWidget):
                 int(1.5 * (patient_export_button.size.width() / 3)),
                 patient_export_button.size.height(),
             )
-
 
             if patient not in self.exported_patients.keys():
                 patient_list_item.setBackground(qt.QBrush(qt.QColor(*color_dict['Pastel Red'])))
