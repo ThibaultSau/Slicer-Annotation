@@ -1,38 +1,12 @@
-# Annotation EURAD 
+# Slicer annotation tool
 
-Ce script permet d'automatiser l'annotation de bases médicales avec [3dSlicer](https://www.slicer.org/) en ajoutant un outil pour lire et exporter les images, segmentations et informations d'un patiente.
+This tool adds a floationg window making easier the process of annotating patients. It automates saving patient segmentation to a predefined folder, adds timestamp, operator name to the saved nrrd files, allows to switch to the next patient easily, can display patient information to help the operator... 
 
-## Installation du script
+# Installation instruction
 
-Pour l'utiliser il faut le charger dans Slicer pour qu'il l'utilise automatiquement
+[[The project wiki page]](https://github.com/ThibaultSau/Slicer-Annotation/wiki) contains an installation tutorial (spoiler, just move a file) and a quicke segmentation tutorial for slicer.
 
-Dans les options : 
-Edit > Application Settings > General > Application startup screen
-![](images/lien_script.PNG)
-Le contenu du fichier à cette destination doit être remplacé par celui du fichier slicerrc fourni (clic droit > ouvrir avec notepad++ > CTRL+A> CRTL+C, dans le fichier .slicerrc.py>clic droit> ouvrir avec notepad++ > CTRL+A > CRTL+V)
+# Main features
 
-A chaque démarage de slicer le script sera chargé et ouvrira une fenêtre de dialogue avec plusieurs options.
-
-![](images/Capture_fenetre_vide.PNG)
-
-La partie à gauche chargera la liste des patientes d'un dossier.
-
-Le bouton "Next" permet d'exporter les données d'une patiente dans le dossier d'export et de charger le suivant.
-Si les patientes suivant on déjà été annotées, la première patiente qui n'a pas encore été annotée sera chargée.
-
-Le bouton "Export patient images" exportera les volumes (pas les segmentations) du patient dans le dossier d'export
-
-La barre "Directory" permet de décider quel dossier sera chargé, le bouton load a coté permet de charge le dossier rempli. La barre est juste textuelle, elle ne permet pas pour l'instant d'explorer les dossiers, il faut copier le chemin exact.
-
-La barre "Export directory" permet de préciser quel dossier sera utilisé pour l'export des segmentations. Je vous conseille de ne pas le changer.
-
-La barre "Operator name" permet de sauvegarder le nom de la personne qui a réalisé la segmentation dans le nom du fichier de segmentation. Si vous ne voulez pas apparaitre vous pouvez le vider.
-
-Après avoir copié le chemin dans la barre "Directory" la fenêtre ressemblera à ça :
-![](images/Capture_fenetre_chargee.PNG)
-
-Les patients rouges ne sont pas segmentés, les patients bleus foncé ont au moins une segmentation de faite, le petient gris est le patient actuellement chargé dans Slicer.
-
-L'onglet en bas à droite indique les informations du patient :
-- Les différentes lésions du patient : la taille de la lésion, son origine et le diagnostic pour aider à retrouver la lésion
-- Les différents volumes du patient, les volumes sur une même ligne ont les mêmes dimensions et un seul de ces volumes peut être segmenté.
+![empty window](images/slicer_annot_empty.png)
+The window contains patient information and several buttons that automate tedious clicking tasks in slicer.
