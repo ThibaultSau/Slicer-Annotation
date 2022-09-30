@@ -286,7 +286,7 @@ class MainWindow(qt.QWidget):
         # Getting the current date and time
         dt = datetime.now()
         if self.current_patient and self.export_dir:
-            self.info_window.setText(f"Exporting {lesion_specificity.replace('_',' ')}segmentation")
+            self.info_window.setText(f"{lesion_specificity.replace('_',' ')} segmentation exported")
             if slicer.util.getNodesByClass("vtkMRMLSegmentationNode"):
                 if not os.path.isdir(self.export_path()):
                     print("patient export dir does not exist, creating")
