@@ -9,4 +9,5 @@ This tool adds a floationg window making easier the process of annotating patien
 ## Main features
 
 ![empty window](images/slicer_annot_empty.png)
+
 The window contains patient information and several buttons that automate tedious clicking tasks in slicer.
