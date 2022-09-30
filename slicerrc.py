@@ -346,7 +346,7 @@ class MainWindow(qt.QWidget):
                     text += "\n"
             else :
                 text += "No patient info found\n"
-        text += "\nVolume a segmenter : au choix, un par ligne\n\n"
+        text += "\nVolume à segmenter : au choix, un par ligne\n\n"
         vol_shape = self.sort_volumes_by_shape()
         for _, item in vol_shape.items():
             text_to_add = [
@@ -368,7 +368,7 @@ class MainWindow(qt.QWidget):
             )
             print(text_to_add)
             if len(text_to_add) > 10:
-                text += 'Un parmis : '
+                text += 'Un parmi : '
                 text += text_to_add
                 text += ".\n"
         self.dialog_window.setText(text)
