@@ -26,11 +26,11 @@ color_dict = {
 # TODO : avoir un bouton pour ouvrir le dossier du patient
 # TODO : DOCUMENTATION
 
-# TODO : bug quand réimport une seg, ne peut plus changer de patient
+# TODO : bug quand reimport une seg, ne peut plus changer de patient
 # TODO : fenetre seg qui est au dessus de slicer mais pas au dessus de toute les fenetres 
 
-# TODO : importer toutes les segmentations si elle ont été volumes
-# TODO : Gérer les segmentations incomplètes/que les ovaires sains segmentés...
+# TODO : importer toutes les segmentations si elle ont ete volumes
+# TODO : Gerer les segmentations incompletes/que les ovaires sains segmentes...
 
 def restart():
     slicer.app.restart()
@@ -140,11 +140,11 @@ class MainWindow(qt.QWidget):
         self.export_dir_bar.clicked.connect(self.change_export_dir)
 
         self.operator_bar = DirectoryLineEdit(
-            "Nom de l'opérateur", "Confirmer", default_text=self.operator_name
+            "Nom de l'operateur", "Confirmer", default_text=self.operator_name
         )
         self.operator_bar.clicked.connect(self.change_operator_name)
 
-        next_button = qt.QPushButton("Segmentation du patient terminée")
+        next_button = qt.QPushButton("Segmentation du patient terminee")
         next_button.clicked.connect(self.next)
         export_button = qt.QPushButton("Exporter les images du patient en nrrd")
         export_button.clicked.connect(self.save_all_volumes)
@@ -188,7 +188,7 @@ class MainWindow(qt.QWidget):
     def change_operator_name(self, operator_name):
         print(f"Changing operator name to : {operator_name} ")
         self.operator_name = operator_name
-        self.info_window.setText("Changement du nom de l'opérateur")
+        self.info_window.setText("Changement du nom de l'operateur")
         self.write_config()
 
     def sort_volumes_by_shape(self):
@@ -260,13 +260,13 @@ class MainWindow(qt.QWidget):
                     f"Volume {os.path.join(self.export_path(),volume.GetName()[3:])} saved"
                 )
         elif self.current_patient is None:
-            self.info_window.setText("Aucun patient chargé, rien à faire")
+            self.info_window.setText("Aucun patient charge, rien a faire")
         elif self.export_dir is None:
             self.info_window.setText("Pas de dossier d'export")
         else:
             self.info_window.setText("Erreur inconnue pendant l'exportation des volumes du patient")
 
-    # TODO : améliorer cette fonction ? si elle est pas buguée
+    # TODO : ameliorer cette fonction ? si elle est pas buguee
     def load_exported_patients(self):
         if self.current_dir and self.export_dir:
             export_folder = os.path.join(self.current_dir, self.export_dir)
@@ -321,7 +321,7 @@ class MainWindow(qt.QWidget):
             else:
                 self.info_window.setText("Rien a exporter")
         elif self.current_patient is None:
-            self.info_window.setText("Pas de patient chargé, rien a faire")
+            self.info_window.setText("Pas de patient charge, rien a faire")
         elif self.export_dir is None:
             self.info_window.setText("Pas de dossier d'export")
         else:
@@ -346,7 +346,7 @@ class MainWindow(qt.QWidget):
                     text += "\n"
             else :
                 text += "No patient info found\n"
-        text += "\nVolume à segmenter : au choix, un par ligne\n\n"
+        text += "\nVolume a segmenter : au choix, un par ligne\n\n"
         vol_shape = self.sort_volumes_by_shape()
         for _, item in vol_shape.items():
             text_to_add = [
@@ -455,7 +455,7 @@ class MainWindow(qt.QWidget):
             )
         )
         self.change_export_dir(self.export_dir_bar.text_input.text)
-        self.info_window.setText('Dossier chargé')
+        self.info_window.setText('Dossier charge')
         self.write_config()
 
     def load_patients_in_list(self):
