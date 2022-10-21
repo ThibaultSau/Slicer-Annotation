@@ -432,6 +432,7 @@ class MainWindow(qt.QWidget):
                             "lesion size": parts[2],
                             "lesion_side": parts[3],
                             "diagnosis": parts[27].rstrip("\n"),
+                            "diagnosis type": parts[26].rstrip("\n"),
 
                         }
                     )
