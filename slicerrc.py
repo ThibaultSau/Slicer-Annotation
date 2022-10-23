@@ -143,6 +143,10 @@ class MainWindow(qt.QWidget):
             "Nom de l'operateur", "Confirmer", default_text=self.operator_name
         )
         self.operator_bar.clicked.connect(self.change_operator_name)
+        self.remarques = DirectoryLineEdit(
+            "Remarque", "Confirmer", default_text=""
+        )
+        self.remarques.clicked.connect(self.save_remarques)
 
         next_button = qt.QPushButton("Segmentation du patient terminee")
         next_button.clicked.connect(self.next)
@@ -162,12 +166,20 @@ class MainWindow(qt.QWidget):
         self.custom_layout.addWidget(self.search_bar, 2, listwidgetsize + 1)
         self.custom_layout.addWidget(self.export_dir_bar, 3, listwidgetsize + 1)
         self.custom_layout.addWidget(self.operator_bar, 4, listwidgetsize + 1)
-        self.custom_layout.addWidget(self.dialog_window, 5, listwidgetsize + 1)
-        self.custom_layout.addWidget(self.info_window, 9, listwidgetsize + 1)
+        self.custom_layout.addWidget(self.remarques, 5, listwidgetsize + 1)
+        self.custom_layout.addWidget(self.dialog_window, 6, listwidgetsize + 1)
+        self.custom_layout.addWidget(self.info_window, 10, listwidgetsize + 1)
 
         # Set the layout on the application's window
         self.setLayout(self.custom_layout)
     
+    def save_remarques(self,text):
+        if self.current_patient :
+            if not os.path.isdir(self.export_path()):
+                os.mkdir(self.export_path())
+            with open(os.path.join(self.export_path(),"remarques.txt"),'a')as f:
+                f.writelines(f"{text}\n")
+
     def load_config(self):
         work_dir,export_dir,operator_name = None, None, None
         config_path = os.path.join(os.path.normpath(slicer.app.slicerHome),'config_seg.txt')
