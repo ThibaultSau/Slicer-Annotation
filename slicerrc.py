@@ -179,6 +179,7 @@ class MainWindow(qt.QWidget):
                 os.mkdir(self.export_path())
             with open(os.path.join(self.export_path(),"commentary.txt"),'a')as f:
                 f.writelines(f"{text}\n")
+            self.commentary.text_input.setText("default_text")
 
     def load_config(self):
         work_dir,export_dir,operator_name = None, None, None
