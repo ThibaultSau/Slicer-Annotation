@@ -1,3 +1,5 @@
+#Copyright [2022] [ThibaultSau]
+
 # import dicomweb_client
 # import vtk, ctk
 # import DICOMLib
