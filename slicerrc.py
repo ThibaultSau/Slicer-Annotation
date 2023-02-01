@@ -262,16 +262,20 @@ class MainWindow(qt.QWidget):
     def save_all_volumes(self):
         if self.current_patient and self.export_dir:
             for volume in slicer.util.getNodesByClass("vtkMRMLScalarVolumeNode"):
-                slicer.util.exportNode(
-                    volume,
-                    os.path.join(
-                        self.export_path(),
-                        volume.GetName()[3:].replace(":", "") + ".nrrd",
-                    ),
-                )
-                print(
-                    f"Volume {os.path.join(self.export_path(),volume.GetName()[3:])} saved"
-                )
+                try : 
+                    slicer.util.exportNode(
+                        volume,
+                        os.path.join(
+                            self.export_path(),
+                            volume.GetName()[3:].replace(":", " ") + ".nrrd",
+                        ),
+                    )
+                    self.info_window.setText(f"Volume {os.path.join(self.export_path(),volume.GetName()[3:])} saved")
+                    print(
+                        f"Volume {os.path.join(self.export_path(),volume.GetName()[3:])} saved"
+                    )
+                except Exception as e:
+                    self.info_window.setText(f'Error patient {e}')
         elif self.current_patient is None:
             self.info_window.setText("Aucun patient charge, rien a faire")
         elif self.export_dir is None:
@@ -538,6 +542,16 @@ class MainWindow(qt.QWidget):
             self.save_all_seg(self.lesion_name[lesion_number])
             for seg in slicer.util.getNodesByClass("vtkMRMLSegmentationNode"):
                 slicer.mrmlScene.RemoveNode(seg)
+
+    def export_all_patients(self):
+        repeat = True
+        while repeat :
+            try :
+                self.save_all_volumes()
+                self.next()
+            except :
+                repeat=False
+    
 
 
 if __name__ == "__main__":
