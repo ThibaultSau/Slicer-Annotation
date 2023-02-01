@@ -267,7 +267,7 @@ class MainWindow(qt.QWidget):
                         volume,
                         os.path.join(
                             self.export_path(),
-                            volume.GetName()[3:].replace(":", " ") + ".nrrd",
+                            volume.GetName()[3:].lstrip(' :0123456789.').replace(':',' ').replace('  ',' ').replace('  ',' ') + ".nrrd",
                         ),
                     )
                     self.info_window.setText(f"Volume {os.path.join(self.export_path(),volume.GetName()[3:])} saved")
@@ -317,9 +317,9 @@ class MainWindow(qt.QWidget):
                         # seg.setMasterVolumeNode(item) utiliser plutot SetNodeReferenceID mais pas de doc pour l'instant
                         seg_name = os.path.join(
                             self.export_path(),
-                            item.GetName()[3:].replace(":", "")
+                            item.GetName().lstrip(' :0123456789.').replace(':',' ').replace('  ',' ').replace('  ',' ')
                             + "_"
-                            + self.operator_name
+                            + self.operator_name.replace(' ','_')
                             + "_"
                             + str(dt)[:16].replace(" ", "-").replace(":", "_")
                             + "_"
@@ -549,7 +549,8 @@ class MainWindow(qt.QWidget):
             try :
                 self.save_all_volumes()
                 self.next()
-            except :
+            except Exception as e :
+                self.info_window.setText(f'Erreur {e} ')
                 repeat=False
     
 
