@@ -4,7 +4,7 @@ This tool adds a floationg window making easier the process of annotating patien
 
 ## Installation instruction
 
-[[The project wiki page]](https://github.com/ThibaultSau/Slicer-Annotation/wiki) contains an installation tutorial (spoiler, just move a file) and a quicke segmentation tutorial for slicer.
+[[The project wiki page]](https://github.com/ThibaultSau/Slicer-Annotation/wiki) contains an installation tutorial (spoiler, just move a file) and a quick segmentation tutorial for slicer.
 
 ## Main features
 
