@@ -314,7 +314,8 @@ class MainWindow(qt.QWidget):
                         slicer.vtkMRMLSegmentationNode.GetReferenceImageGeometryReferenceRole()
                     )
                     for item in vol_shape[slicer.util.arrayFromVolume(master).shape]:
-                        # seg.setMasterVolumeNode(item) utiliser plutot SetNodeReferenceID mais pas de doc pour l'instant
+                        # seg.setMasterVolumeNode(item) utiliser plutot SetNodeReferenceID
+                        #seg.SetNodeReferenceID(master.GetID())
                         seg_name = os.path.join(
                             self.export_path(),
                             item.GetName().lstrip(' :0123456789.').replace(':',' ').replace('  ',' ').replace('  ',' ')
@@ -330,6 +331,7 @@ class MainWindow(qt.QWidget):
                         slicer.util.exportNode(
                             seg,
                             seg_name,
+                            world=True,
                         )
                         print(f"Segmentation {seg_name} saved")
                 if self.current_patient not in self.exported_patients.keys():
